@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">ManaCalc</string>
+    <string name="submit_str">Calculate!</string>
+    <string name="reset_str">Reset</string>
+    <string name="white_text_hint">White land count</string>
+    <string name="blue_text_hint">Blue land count</string>
+    <string name="green_text_hint">Green land count</string>
+    <string name="red_text_hint">Red land count</string>
+    <string name="black_text_hint">Black land count</string>
+    <string name="land_text_hint">Total land count</string>
+</resources>
