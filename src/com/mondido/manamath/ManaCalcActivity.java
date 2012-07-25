@@ -1,87 +1,116 @@
 package com.mondido.manamath;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.WindowManager.LayoutParams;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.TableLayout.LayoutParams;
 
 public class ManaCalcActivity extends Activity {
-	private EditText whiteCountEditView;
-	private EditText greenCountEditView;
-	private EditText blueCountEditView;
-	private EditText redCountEditView;
-	private EditText blackCountEditView;
-	private EditText landCountEditView;
 	
+	private Map<ManaColor, EditText> landCountEditViews;
+	private EditText totalLandCountEditView;
 	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        whiteCountEditView=(EditText)findViewById(R.id.white_count);
-        blackCountEditView=(EditText)findViewById(R.id.black_count);
-        redCountEditView=(EditText)findViewById(R.id.red_count);
-        blueCountEditView=(EditText)findViewById(R.id.blue_count);
-        greenCountEditView=(EditText)findViewById(R.id.green_count);
-        landCountEditView=(EditText)findViewById(R.id.land_count);   
+        landCountEditViews=new HashMap<ManaColor, EditText>();
+        landCountEditViews.put(ManaColor.WHITE,(EditText)findViewById(R.id.white_count));
+        landCountEditViews.put(ManaColor.BLACK,(EditText)findViewById(R.id.black_count));
+        landCountEditViews.put(ManaColor.RED,(EditText)findViewById(R.id.red_count));
+        landCountEditViews.put(ManaColor.BLUE,(EditText)findViewById(R.id.blue_count));
+        landCountEditViews.put(ManaColor.GREEN,(EditText)findViewById(R.id.green_count));
+        totalLandCountEditView=(EditText)findViewById(R.id.land_count);   
     }
-    
-    public void onSwaggit(View v){
+    /**
+     * OnClick Event to invoke the calculation of the Mana spread
+     * @param view
+     */
+    public void onSwaggit(View view){
+    	cleanAnswerTextViews();
     	this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-    	ManaCalculator calculator=new ManaCalculator(Integer.parseInt(landCountEditView.getText().toString()));
-    	
-    	int[] symbolCounts=new int[5];
-    	
-    	getManaCounts(symbolCounts);
-    	
-    	calculator.calculateMana(symbolCounts);
-    	
-    	setAnswerViews(calculator);
-    	
-    	
+    	String totalLandCount;
+    	if(!(totalLandCount=totalLandCountEditView.getText().toString()).isEmpty()){
+    		ManaCalculator calculator=new ManaCalculator(Integer.parseInt(totalLandCount));
+    		
+    		Map<ManaColor,Integer>symbolCounts=new HashMap<ManaColor, Integer>();
+    		
+    		getManaCounts(symbolCounts);
+    		
+    		calculator.calculateMana(symbolCounts);
+    		
+    		makeAnswerTextViews(calculator);
+    	}
     }
     
-    private void setAnswerViews(ManaCalculator calc){
-    	LinearLayout rel=(LinearLayout)findViewById(R.id.main_layout);
-    	if(calc.getWhiteLandCount()>0)
-    		rel.addView(makeView(calc.getWhiteLandCount(),"Plains"));
-    	if(calc.getBlackLandCount()>0)
-    		rel.addView(makeView(calc.getBlackLandCount(),"Swamps"));
-    	if(calc.getRedLandCount()>0)
-    		rel.addView(makeView(calc.getRedLandCount(),"Mountains"));
-    	if(calc.getBlueLandCount()>0)
-    		rel.addView(makeView(calc.getBlueLandCount(),"Islands"));
-    	if(calc.getGreenLandCount()>0)
-    		rel.addView(makeView(calc.getGreenLandCount(),"Forests"));
+    public void reset(View v){
+    	cleanAnswerTextViews();
+    	for (EditText view : landCountEditViews.values()) {
+			view.setText("");
+		}
+    	totalLandCountEditView.setText("");
     }
     
- private TextView makeView(long count,String name){
+    private void cleanAnswerTextViews() {
+		LinearLayout rel = getAnswerLayout();
     	
-    	TextView resultView=new TextView(this);
+    	rel.removeAllViews();
+		
+	}
+	private LinearLayout getAnswerLayout() {
+		LinearLayout rel=(LinearLayout)findViewById(R.id.answer_layout);
+		return rel;
+	}
+	/**
+     * Makes the TextViews that are needed to be made based on which values from the ManaCalculator calc comes back with.
+     * These TextViews are then added to the main layout.
+     * @param calc
+     */
+    private void makeAnswerTextViews(ManaCalculator calc){
+    	LinearLayout rel = getAnswerLayout();
+    	for (ManaColor color : ManaColor.values()) {
+    		Long count;
+			if((count=calc.getLandCount(color))>0){
+				rel.addView(makeView(count,color.toString()),0);
+			}
+		}
+    }
+    
+    /**
+     * Factory method to facilitate the creation of TextViews
+     * @param count
+     * @param name
+     * @return
+     */
+    private TextView makeView(long count,String name){
+    	
+    	final TextView resultView=new TextView(this);
+    	resultView.setTextSize(25);
     	resultView.setText(count+" "+name);
-    	LayoutParams p = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+    	ViewGroup.LayoutParams p = new LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
     	resultView.setLayoutParams(p);
     	return resultView;
     }
 
-	private void getManaCounts(int[] symbolCounts) {
-		if(!whiteCountEditView.getText().toString().isEmpty())
-			symbolCounts[0]=Integer.parseInt((String) whiteCountEditView.getText().toString());
-		if(!blackCountEditView.getText().toString().isEmpty())
-			symbolCounts[1]=Integer.parseInt((String) blackCountEditView.getText().toString());
-    	if(!blueCountEditView.getText().toString().isEmpty())
-    		symbolCounts[2]=Integer.parseInt((String) blueCountEditView.getText().toString());
-    	if(!greenCountEditView.getText().toString().isEmpty())
-    		symbolCounts[3]=Integer.parseInt((String) greenCountEditView.getText().toString());
-    	if(!redCountEditView.getText().toString().isEmpty())
-    		symbolCounts[4]=Integer.parseInt((String) redCountEditView.getText().toString());
+	private void getManaCounts(Map<ManaColor, Integer> symbolCounts) {
+		for (ManaColor color : ManaColor.values()) {
+			String text;
+			if(!(text=landCountEditViews.get(color).getText().toString()).isEmpty()){
+				symbolCounts.put(color, Integer.valueOf(text));
+			}
+		}
 	}
 }

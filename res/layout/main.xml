@@ -4,21 +4,21 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
-
+
     <EditText
         android:id="@+id/white_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="@string/white_text_hint"
         android:inputType="number" />
-
+
     <EditText
         android:id="@+id/blue_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="@string/blue_text_hint"
         android:inputType="number" />
-
+
     <EditText
         android:id="@+id/green_count"
         android:layout_width="wrap_content"
@@ -32,14 +32,14 @@
         android:layout_height="wrap_content"
         android:inputType="number"
         android:hint="@string/red_text_hint" />
-
+
     <EditText
         android:id="@+id/black_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="@string/black_text_hint"
         android:inputType="number" />
-
+
     <EditText
         android:id="@+id/land_count"
         android:layout_width="wrap_content"
@@ -52,11 +52,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/submit_str"
-        android:onClick="onSwaggit" />
+        android:onClick="onSwaggit" />
     <Button
         android:id="@+id/reset"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/reset_str" />
+        android:text="@string/reset_str"
+        android:onClick="reset" />
+    
+    <LinearLayout 
+        android:id="@+id/answer_layout"
+        android:layout_width="fill_parent"
+    	android:layout_height="fill_parent"
+    	android:orientation="vertical"/>
     
 </LinearLayout>

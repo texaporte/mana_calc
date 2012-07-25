@@ -1,27 +1,18 @@
 package com.mondido.manamath;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ManaCalculator {
 	private int LandCount;
-	private long[] ColorLandCounts=new long[5];
+	private Map<ManaColor,Long> ColorLandCounts;
 
-	public long getWhiteLandCount() {
-		return ColorLandCounts[0];
-	}
-
-	public long getBlackLandCount() {
-		return ColorLandCounts[1];
-	}
-
-	public long getBlueLandCount() {
-		return ColorLandCounts[2];
-	}
-
-	public long getGreenLandCount() {
-		return ColorLandCounts[3];
-	}
-
-	public long getRedLandCount() {
-		return ColorLandCounts[4];
+	public long getLandCount(ManaColor color){
+		try {
+			return ColorLandCounts.get(color);
+		} catch (NullPointerException e) {
+			return 0;
+		}
 	}
 
 	private void setLandCount(int landCount) {
@@ -30,22 +21,25 @@ public class ManaCalculator {
 
 	public ManaCalculator(int landCount) {
 		this.setLandCount(landCount);
+		ColorLandCounts=new HashMap<ManaColor, Long>();
 	}
 	
-	public void calculateMana(int[] symbolCounts){
+	public void calculateMana(Map<ManaColor,Integer> symbolCounts){
 		int totalSymbols=0;
-		for (int i : symbolCounts) {
+		for (Integer i : symbolCounts.values()) {
 			totalSymbols+=i;
 		}
-		for(int i=0;i<symbolCounts.length;i++){
-			ColorLandCounts[i]=calculateLandCount(symbolCounts[i],totalSymbols);
+		for (ManaColor color : ManaColor.values()) {
+			if(symbolCounts.get(color)!=null)
+				calculateLandCount(color, symbolCounts.get(color),totalSymbols);
 		}
+		
 	}
 
-	private long calculateLandCount(int i, int totalSymbols) {
+	private void calculateLandCount(ManaColor color, int i, int totalSymbols) {
 		double landCount=0;
 		landCount=(i*LandCount)/totalSymbols;
-		return Math.round(landCount);
+		ColorLandCounts.put(color, Long.valueOf(Math.round(landCount)));
 	}
 }
 
